@@ -15,7 +15,13 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Google } from "@mui/icons-material";
-import { auth, GoogleAuthProvider, provider, signInWithPopup } from "../config/firebase";
+import {
+  auth,
+  GoogleAuthProvider,
+  provider,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from "../config/firebase";
 import { Alert } from "antd";
 // import Alert from '@mui/material/Alert';
 
@@ -38,31 +44,32 @@ function Copyright(props) {
 }
 
 const validationSchema = Yup.object({
-  email: Yup.string().email("Invalid email address").required("Email is required"),
+  email: Yup.string()
+    .email("Invalid email address")
+    .required("Email is required"),
   password: Yup.string().required("Password is required"),
 });
 
 const defaultTheme = createTheme();
 
 export default function SignInSide() {
-  const googleSignin=()=>{
+  const googleSignin = () => {
     signInWithPopup(auth, provider)
-  .then((result) => {
-    const credential = GoogleAuthProvider.credentialFromResult(result);
-    const token = credential.accessToken;
-    const user = result.user;
-    alert("Successfully Login")
-  }).catch((error) => {
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    const email = error.customData.email;
-    const credential = GoogleAuthProvider.credentialFromError(error);
-    // <Alert severity="error">Error! Try again.</Alert>
-    alert("Error! Try again")
-
-
-  });
-  }
+      .then((result) => {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+        const user = result.user;
+        alert("Successfully Login");
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        const email = error.customData.email;
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        // <Alert severity="error">Error! Try again.</Alert>
+        alert("Error! Try again");
+      });
+  };
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -71,9 +78,22 @@ export default function SignInSide() {
     validationSchema: validationSchema,
     onSubmit: (values) => {
       console.log("Form submitted with values:", values);
+      signin(values);
     },
   });
-
+  const signin = async (values) => {
+    await signInWithEmailAndPassword(auth, values.email, values.password)
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        alert("Successfully Login");
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        alert("Error! Try again");
+      });
+  };
   return (
     <ThemeProvider theme={defaultTheme}>
       <Grid container component="main" sx={{ height: "100vh" }}>
@@ -84,10 +104,13 @@ export default function SignInSide() {
           sm={4}
           md={7}
           sx={{
-            backgroundImage: "url(https://source.unsplash.com/random?wallpapers)",
+            backgroundImage:
+              "url(https://source.unsplash.com/random?wallpapers)",
             backgroundRepeat: "no-repeat",
             backgroundColor: (t) =>
-              t.palette.mode === "light" ? t.palette.grey[50] : t.palette.grey[900],
+              t.palette.mode === "light"
+                ? t.palette.grey[50]
+                : t.palette.grey[900],
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
@@ -139,7 +162,9 @@ export default function SignInSide() {
                 autoComplete="current-password"
                 value={formik.values.password}
                 onChange={formik.handleChange}
-                error={formik.touched.password && Boolean(formik.errors.password)}
+                error={
+                  formik.touched.password && Boolean(formik.errors.password)
+                }
                 helperText={formik.touched.password && formik.errors.password}
               />
               <FormControlLabel
@@ -155,14 +180,14 @@ export default function SignInSide() {
                 Sign In
               </Button>
               <Button
-              onClick={()=>googleSignin()}
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-              startIcon={<Google/>}
+                onClick={() => googleSignin()}
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+                startIcon={<Google />}
               >
                 Sign In with Google
-                </Button>
+              </Button>
               <Grid container>
                 <Grid item xs>
                   <Link href="#" variant="body2">

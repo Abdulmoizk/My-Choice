@@ -6,8 +6,10 @@ import SignInSide from "../pages/login";
 import SignUp from "../pages/register";
 import { useEffect, useState } from "react";
 import { auth, onAuthStateChanged } from "./firebase";
+import { Spin } from "antd";
 
 function AppRouter(){
+    const [loader, setloader] = useState(true)
     const [user, setuser]= useState(false)
     useEffect(()=>{
         onAuthStateChanged(auth, (user) => {
@@ -15,12 +17,22 @@ function AppRouter(){
               const uid = user.uid;
               setuser(true)
             } else {
-                setuser(false)           
+                setuser(false)                           
             }
-          });
+            setloader(false)
+          },[]);
     })
     return(
-
+        <>
+       
+            
+    {loader?
+    <div className="p-5 m-5">
+        <Spin tip="Loading" size="large">
+            <div className="content" />
+        </Spin>
+    </div>
+        :
         <BrowserRouter>
     <Routes>
         <Route path="/" element={user?<AppLayout><HomePage/></AppLayout>: <Navigate to="/login"/>} />  
@@ -30,8 +42,8 @@ function AppRouter(){
         <Route path="/signup" element={user? <Navigate to="/"/> :<SignUp/>} />  
 
     </Routes>
-    </BrowserRouter>
-        )
+    </BrowserRouter>}
+    </> )
 }
 
 export default AppRouter;

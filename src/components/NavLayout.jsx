@@ -18,7 +18,7 @@ const AppLayout = ({ children }) => {
       <Layout className="layout">
         <Header
           style={{
-            // background: 'white',
+            background: "#09D7CB",
             display: "flex",
             alignItems: "center",
           }}
@@ -33,12 +33,17 @@ const AppLayout = ({ children }) => {
             defaultSelectedKeys={["2"]}
             items={items}
             style={{
+              color: "black",
+              fontWeight: "550",
+              fontSize: "16px",
               flex: 1,
+              background: "#09D7CB",
               minWidth: 0,
             }}
           />
           <Button
             icon={<LogoutOutlined />}
+            
             onClick={() => {
               signOut(auth)
                 .then(() => {
